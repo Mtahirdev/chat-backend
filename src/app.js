@@ -9,7 +9,7 @@ let app = express();
 
 app.use(
   cors({
-    origin: "https://chat-frontend-murex-gamma.vercel.app",
+    origin: "https://chat-frontend-two-psi.vercel.app/",
     credentials: true,
   }),
 );
