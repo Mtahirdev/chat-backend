@@ -8,7 +8,8 @@ export const initSocket = (httpServer) => {
   io = new Server(httpServer, {
     cors: {
       origin:
-        process.env.FRONTEND_URL || "https://chat-frontend-two-psi.vercel.app",
+        process.env.FRONTEND_URL ||
+        "https://chat-frontend-sigma-eight.vercel.app",
       methods: ["GET", "POST"],
       credentials: true,
     },

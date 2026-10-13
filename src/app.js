@@ -11,7 +11,7 @@ let app = express();
 
 app.use(
   cors({
-    origin: "https://chat-frontend-two-psi.vercel.app",
+    origin: "https://chat-frontend-sigma-eight.vercel.app",
     credentials: true,
   }),
 );
