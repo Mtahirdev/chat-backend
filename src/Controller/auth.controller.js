@@ -25,7 +25,7 @@ export let SignupFun = async (req, res) => {
     let newuser = new UserModel({ username, email, password: hashed_password });
 
     let otp = generateotp();
-    let html = emailTemplate();
+    let html = emailTemplate(otp);
 
     console.log(otp);
 
