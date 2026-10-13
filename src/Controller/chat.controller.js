@@ -4,8 +4,8 @@ import { validationResult } from "express-validator";
 import ConversationModel from "../Models/conversation.model.js";
 import jwt from "jsonwebtoken";
 import MessageModel from "../Models/message.model.js";
-import { getReceiverSocketId } from "../../server.js";
-import { io } from "../../server.js";
+import { getReceiverSocketId } from "../socket.js";
+import { io } from "../socket.js";
 
 export let SetConversation = async (req, res) => {
   try {
