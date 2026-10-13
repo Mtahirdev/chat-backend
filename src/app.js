@@ -4,6 +4,8 @@ import AuthRouter from "./Router/auth.routes.js";
 import cookieParser from "cookie-parser";
 import ChatRouter from "./Router/chat.routes.js";
 import ConnectDB from "./config/Database.js";
+import { createServer } from "http";
+import { initSocket } from "./socket.js";
 
 let app = express();
 
@@ -18,6 +20,10 @@ app.use(cookieParser());
 
 await ConnectDB();
 
+const httpServer = createServer(app);
+
+initSocket(httpServer);
+
 app.use(AuthRouter);
 app.use(ChatRouter);
-export default app;
+export default httpServer;
