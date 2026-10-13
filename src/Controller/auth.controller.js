@@ -34,6 +34,9 @@ export let SignupFun = async (req, res) => {
       .update(otp)
       .digest("hex");
 
+    console.log("OTP controller reached");
+    console.log("MongoDB readyState:", mongoose.connection.readyState);
+
     const otpstore = new OTP({
       userId: newuser._id,
       email: newuser.email,
