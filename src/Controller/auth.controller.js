@@ -9,6 +9,7 @@ import jwt from "jsonwebtoken";
 import { emailTemplate, generateotp } from "../utils/utils.js";
 import crypto from "crypto";
 import ConversationModel from "../Models/conversation.model.js";
+import mongoose from "mongoose";
 
 export let SignupFun = async (req, res) => {
   try {
