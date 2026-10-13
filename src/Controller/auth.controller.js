@@ -60,8 +60,8 @@ export let SignupFun = async (req, res) => {
 
     res.cookie("refresh_token", refresh_token, {
       httpOnly: true,
-      sameSite: "lax",
-      secure: false,
+      sameSite: "none",
+      secure: true,
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
     await newuser.save();
@@ -150,9 +150,9 @@ export let OtpFun = async (req, res) => {
     });
 
     res.cookie("refresh_token", refreshtoken, {
-      sameSite: "lax",
+      sameSite: "none",
       httpOnly: true,
-      secure: false,
+      secure: true,
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -236,8 +236,8 @@ export const LoginFun = async (req, res) => {
 
     res.cookie("refresh_token", refresh_token, {
       httpOnly: true,
-      sameSite: "lax",
-      secure: false,
+      sameSite: "none",
+      secure: true,
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -265,8 +265,8 @@ export const LoginFun = async (req, res) => {
 
   res.cookie("refresh_token", refresh_token, {
     httpOnly: true,
-    sameSite: "lax",
-    secure: false,
+    sameSite: "none",
+    secure: true,
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 
@@ -388,8 +388,8 @@ export const RefreshToken = async (req, res) => {
 
     res.cookie("refresh_token", newRefreshToken, {
       httpOnly: true,
-      sameSite: "lax",
-      secure: false,
+      sameSite: "none",
+      secure: true,
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -486,8 +486,8 @@ export let Getme = async (req, res) => {
 
     res.cookie("refresh_token", newRefreshToken, {
       httpOnly: true,
-      sameSite: "lax",
-      secure: false,
+      sameSite: "none",
+      secure: true,
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
