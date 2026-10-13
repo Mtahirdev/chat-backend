@@ -125,7 +125,7 @@ export let OtpFun = async (req, res) => {
 
     console.log(currentTime, otpCreatedTime, timeDifference);
     // OTP expires after 1 minute
-    const otpExpiryTime = 60 * 1000;
+    const otpExpiryTime = 240 * 1000;
 
     console.log(otpExpiryTime);
 
