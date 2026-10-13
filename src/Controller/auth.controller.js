@@ -228,6 +228,18 @@ export const LoginFun = async (req, res) => {
       otp: hashedOtp,
     });
     await otpstore.save();
+    const refresh_token = jwt.sign(
+      { userId: user._id, verified: user.verified, email: user.email },
+      config.jwtsecret,
+      { expiresIn: "7d" },
+    );
+
+    res.cookie("refresh_token", refresh_token, {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: false,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
 
     await sendEmail(user.email, "OTP Verification", `your otp is ${otp}`, html);
     return res.json({ msg_otp: "please verify your email " });
