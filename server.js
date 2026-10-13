@@ -1,5 +1,5 @@
 import app from "./src/app.js";
-import ConnectDB from "./src/config/database.js";
+import ConnectDB from "./src/config/Database.js";
 import config from "./src/config/config.js";
 import { createServer } from "http";
 import { Server } from "socket.io";
