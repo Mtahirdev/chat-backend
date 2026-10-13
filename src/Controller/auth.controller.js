@@ -78,6 +78,8 @@ export let OtpFun = async (req, res) => {
   try {
     const token_cookie = req.cookies.refresh_token;
 
+    console.log(req.cookies.refresh_token);
+
     if (!token_cookie) {
       return res.status(400).json({ msg_login: "please Login" });
     }
