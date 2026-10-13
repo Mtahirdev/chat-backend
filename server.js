@@ -3,8 +3,11 @@ import ConnectDB from "./src/config/Database.js";
 import config from "./src/config/config.js";
 import { createServer } from "http";
 import { initSocket } from "./src/socket.js";
+console.log("server file load");
 
 await ConnectDB();
+
+console.log("server file load 2");
 
 const httpServer = createServer(app);
 
