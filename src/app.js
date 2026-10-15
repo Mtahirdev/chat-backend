@@ -11,7 +11,7 @@ let app = express();
 
 app.use(
   cors({
-    origin: "https://chat-frontend-sigma-eight.vercel.app",
+    origin: "http://localhost:5173",
     credentials: true,
   }),
 );

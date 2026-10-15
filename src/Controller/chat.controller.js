@@ -6,6 +6,8 @@ import jwt from "jsonwebtoken";
 import MessageModel from "../Models/message.model.js";
 import { getReceiverSocketId } from "../socket.js";
 import { io } from "../socket.js";
+import cloudinary from "../utils/cloudinary.js";
+import uploadToCloudinary from "../config/cloudinarystore.js";
 
 export let SetConversation = async (req, res) => {
   try {
@@ -208,7 +210,61 @@ export let SendMsg = async (req, res) => {
     if (!user) {
       return res.status(400).json({ msg_signup: "please signup" });
     }
+
+    console.log(req.body);
+
+    const audio = req.files?.audio?.[0];
+    const file = req.files?.file?.[0];
+
+    console.log(audio);
+    console.log(file);
+
     let { msg, receiverid, senderid, conversationid } = req.body;
+
+    let filetype = "";
+
+    if (file != undefined) {
+      if (file.mimetype.startsWith("image/")) {
+        filetype = "image";
+      }
+
+      if (
+        file.mimetype.startsWith("video/") ||
+        file.mimetype.startsWith("audio/")
+      ) {
+        filetype = "video";
+      }
+
+      if (file.mimetype === "application/pdf") {
+        filetype = "raw";
+      }
+    }
+
+    let type = "";
+    let audiourl = "";
+    let fileurl = "";
+
+    if (audio != undefined) {
+      let result = await uploadToCloudinary(audio, "video", "chat/audio");
+      audiourl = result.secure_url;
+      type = "audio";
+      msg = "";
+      if (file != undefined) {
+        let result = await uploadToCloudinary(file, filetype, "chat/data");
+        type = `audio with ${file.mimetype}`;
+        fileurl = result.secure_url;
+      }
+    }
+
+    if (audio == undefined && msg != "") {
+      if (file != undefined) {
+        let result = await uploadToCloudinary(file, filetype, "chat/data");
+        type = `text with ${file.mimetype}`;
+        fileurl = result.secure_url;
+      } else {
+        type = "text";
+      }
+    }
 
     let conversation = await ConversationModel.findById({
       _id: conversationid,
@@ -218,6 +274,9 @@ export let SendMsg = async (req, res) => {
       message: msg,
       senderId: senderid,
       receiverId: receiverid,
+      msg: type,
+      audiourl,
+      attachedfileurl: fileurl,
     });
 
     conversation.messages.push(newmsg._id);
@@ -235,5 +294,46 @@ export let SendMsg = async (req, res) => {
       return res.status(403).json({ msg: "Token expired" });
     }
     return res.status(500).json({ msgerr: "Internal server error" });
+  }
+};
+
+export const uploadVoice = async (req, res) => {
+  console.log("File:", req.file.mimetype);
+  console.log("Body:", req.body);
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        message: "Voice file is required",
+      });
+    }
+
+    const result = await new Promise((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(
+        {
+          resource_type: "video",
+          folder: "chat-voice-messages",
+        },
+        (error, result) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(result);
+          }
+        },
+      );
+
+      stream.end(req.file.buffer);
+    });
+
+    return res.status(200).json({
+      message: "Voice uploaded successfully",
+      audioUrl: result.secure_url,
+    });
+  } catch (error) {
+    console.error("Cloudinary upload error:", error);
+
+    return res.status(500).json({
+      message: "Voice upload failed",
+    });
   }
 };

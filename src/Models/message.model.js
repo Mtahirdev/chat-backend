@@ -1,5 +1,15 @@
 import mongoose from "mongoose";
 
+// possible types
+
+// text
+
+// text with img
+
+// text with video
+
+// text
+
 const MessageSchema = new mongoose.Schema(
   {
     senderId: {
@@ -16,8 +26,19 @@ const MessageSchema = new mongoose.Schema(
 
     message: {
       type: String,
+      default: "",
+    },
+    audiourl: {
+      type: String,
+      default: "",
+    },
+    attachedfileurl: {
+      type: String,
+      default: "",
+    },
+    msg: {
+      type: String,
       required: true,
-      trim: true,
     },
   },
   {
