@@ -19,6 +19,37 @@ const upload = multer({
   },
 });
 
+const uploadFields = upload.fields([
+  { name: "audio", maxCount: 1 },
+  { name: "file", maxCount: 1 },
+]);
+
+const handleUpload = (req, res, next) => {
+  uploadFields(req, res, (err) => {
+    if (err instanceof multer.MulterError) {
+      if (err.code === "LIMIT_FILE_SIZE") {
+        return res.status(413).json({
+          msgerr: "File size must not exceed 3 MB.",
+        });
+      }
+
+      return res.status(400).json({
+        msgerr: `Upload failed: ${err.message}`,
+      });
+    }
+
+    if (err) {
+      return res.status(500).json({
+        msgerr: "An error occurred while uploading the file.",
+      });
+    }
+
+    next();
+  });
+};
+
+ChatRouter.post("/chat/sendmessage", handleUpload, SendMsg);
+
 ChatRouter.post(
   "/chat/addconversation",
   express.json(),
@@ -27,13 +58,14 @@ ChatRouter.post(
 );
 
 ChatRouter.post("/chat/getmessage", express.json(), GetMsg);
-ChatRouter.post(
-  "/chat/sendmessage",
-  upload.fields([
-    { name: "audio", maxCount: 1 },
-    { name: "file", maxCount: 1 },
-  ]),
-  SendMsg,
-);
+
+// ChatRouter.post(
+//   "/chat/sendmessage",
+//   upload.fields([
+//     { name: "audio", maxCount: 1 },
+//     { name: "file", maxCount: 1 },
+//   ]),
+//   SendMsg,
+// );
 
 export default ChatRouter;
