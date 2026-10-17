@@ -1,11 +1,7 @@
 import { body } from "express-validator";
 
 let SignupValidation = [
-  body("username")
-    .trim()
-    .notEmpty()
-    .withMessage("Username must be required")
-    
+  body("username").trim().notEmpty().withMessage("Username must be required"),
   body("email").trim().isEmail().withMessage("Please enter valid email"),
   body("password")
     .trim()
