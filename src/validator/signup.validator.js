@@ -5,8 +5,7 @@ let SignupValidation = [
     .trim()
     .notEmpty()
     .withMessage("Username must be required")
-    .isLength({ min: 5, max: 15 })
-    .withMessage("Username must me 5 character"),
+    
   body("email").trim().isEmail().withMessage("Please enter valid email"),
   body("password")
     .trim()
