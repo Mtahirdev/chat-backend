@@ -43,13 +43,7 @@ let user_schema = new mongoose.Schema({
       required: true,
     },
   ],
-  userarr: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "UserModel",
-      required: true,
-    },
-  ],
+  userarr: [],
 });
 
 let UserModel = mongoose.model("UserModel", user_schema);

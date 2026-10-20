@@ -153,11 +153,15 @@ export let GetMsg = async (req, res) => {
     if (!user) {
       return res.status(400).json({ msg_signup: "please signup" });
     }
-    let { id } = req.body;
+    let { id, receiverId } = req.body;
 
-    if (!id) {
+    if (!id && !receiverId) {
       return res.status(400).json({ msg_id: "please give id" });
     }
+
+    let userreceiver = await UserModel.findById({ _id: receiverId });
+
+    console.log(userreceiver);
 
     let conversation = await ConversationModel.findById({ _id: id });
 
@@ -173,9 +177,11 @@ export let GetMsg = async (req, res) => {
       let msg = await MessageModel.findById({ _id: ele });
       messagearray.push(msg);
     }
-    return res
-      .status(200)
-      .json({ success: "message fetched", message: messagearray });
+    return res.status(200).json({
+      success: "message fetched",
+      message: messagearray,
+      userarr: userreceiver.userarr,
+    });
   } catch (error) {
     console.log(error);
 

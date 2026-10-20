@@ -1,4 +1,5 @@
 import { Server } from "socket.io";
+import UserModel from "./Models/user.model.js";
 
 export let io;
 
@@ -7,8 +8,7 @@ const userSocketMap = {};
 export const initSocket = (httpServer) => {
   io = new Server(httpServer, {
     cors: {
-      origin:
-        process.env.FRONTEND_URL || "https://chat-frontend-one.vercel.app",
+      origin: "https://chat-frontend-one.vercel.app",
       methods: ["GET", "POST"],
       credentials: true,
     },
@@ -25,8 +25,22 @@ export const initSocket = (httpServer) => {
 
     io.emit("getOnlineUsers", Object.keys(userSocketMap));
 
-    socket.on("disconnect", () => {
+    socket.on("disconnect", async () => {
       if (userSocketMap[userId] === socket.id) {
+        let user = await UserModel.findById({ _id: userId });
+        const date = new Date();
+
+        const time = date.toLocaleTimeString("en-US", {
+          timeZone: "Asia/Karachi",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: true,
+        });
+        user.userarr.push(time);
+
+        await user.save();
+        io.emit("gettime", time);
+
         delete userSocketMap[userId];
       }
 

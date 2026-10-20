@@ -9,5 +9,5 @@ console.log("server file load");
 console.log("server file load 2");
 
 httpServer.listen(process.env.PORT || config.PORT || 5000, () => {
-  console.log("Server is running");
+  console.log("Server is running ");
 });
