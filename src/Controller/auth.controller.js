@@ -35,9 +35,6 @@ export let SignupFun = async (req, res) => {
       .update(otp)
       .digest("hex");
 
-    console.log("OTP controller reached");
-    console.log("MongoDB readyState:", mongoose.connection.readyState);
-
     const otpstore = new OTP({
       userId: newuser._id,
       email: newuser.email,
@@ -78,8 +75,6 @@ export let OtpFun = async (req, res) => {
   try {
     const token_cookie = req.cookies.refresh_token;
 
-    console.log(req.cookies.refresh_token);
-
     if (!token_cookie) {
       return res.status(400).json({ msg_login: "please Login" });
     }
@@ -93,8 +88,6 @@ export let OtpFun = async (req, res) => {
     }
 
     const decoded = jwt.verify(token_cookie, config.jwtsecret);
-
-    console.log("token decoded", decoded);
 
     const user = await UserModel.findOne({ _id: decoded.userId });
 
@@ -204,8 +197,6 @@ export const LoginFun = async (req, res) => {
   }
 
   const isMatch = await bcrypt.compare(password, user.password);
-
-  console.log(isMatch);
 
   if (!isMatch) {
     return res.status(400).json({ msg_password: "Incorrect Password" });

@@ -8,7 +8,7 @@ import { getReceiverSocketId } from "../socket.js";
 import { io } from "../socket.js";
 import cloudinary from "../utils/cloudinary.js";
 import uploadToCloudinary from "../config/cloudinarystore.js";
-
+import bcrypt from "bcrypt";
 export let SetConversation = async (req, res) => {
   try {
     const token = req.cookies.refresh_token;
@@ -217,8 +217,6 @@ export let SendMsg = async (req, res) => {
       return res.status(400).json({ msg_signup: "please signup" });
     }
 
-    console.log(req.body);
-
     const audio = req.files?.audio?.[0];
     const file = req.files?.file?.[0];
 
@@ -272,12 +270,26 @@ export let SendMsg = async (req, res) => {
       }
     }
 
+    console.log(req.body, "body");
+
+    if (audio == undefined && msg == "") {
+      console.log("hello tye is ");
+
+      if (file != undefined) {
+        let result = await uploadToCloudinary(file, filetype, "chat/data");
+        type = `text with ${file.mimetype}`;
+        fileurl = result.secure_url;
+      }
+    }
+    console.log(type, "type is defined here");
+
     let conversation = await ConversationModel.findById({
       _id: conversationid,
     });
 
     let newmsg = await MessageModel.create({
       message: msg,
+      conversationId: conversation._id,
       senderId: senderid,
       receiverId: receiverid,
       msg: type,
@@ -288,6 +300,7 @@ export let SendMsg = async (req, res) => {
     conversation.messages.push(newmsg._id);
     await conversation.save();
     let receivedId = getReceiverSocketId(receiverid);
+    // let msga = MessageModel.find({ conversationId: conversationid });
     io.to(receivedId).emit("message", newmsg);
     res.status(200).json(newmsg);
   } catch (error) {
@@ -341,5 +354,182 @@ export const uploadVoice = async (req, res) => {
     return res.status(500).json({
       message: "Voice upload failed",
     });
+  }
+};
+
+export let SetProfileimg = async (req, res) => {
+  try {
+    const token = req.cookies.refresh_token;
+
+    if (!token) {
+      return res.status(400).json({ msg_login: "please Login" });
+    }
+
+    const access_token = req.headers.authorization?.split(" ")[1];
+
+    if (!access_token) {
+      return res.status(400).json({ msg_login: "please Login" });
+    }
+
+    const decoded = jwt.verify(access_token, config.jwtsecret);
+
+    const user = await UserModel.findById({ _id: decoded.userId });
+
+    if (!user) {
+      return res.status(400).json({ msg_signup: "please signup" });
+    }
+
+    const file = req.file;
+
+    console.log(req.file);
+
+    let filetype = "image";
+
+    let fileurl = "";
+
+    if (file == undefined) {
+      console.log("file undefined");
+    }
+    const result = await new Promise((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(
+        {
+          resource_type: "image",
+          folder: "chat/data",
+        },
+        (error, result) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(result);
+          }
+        },
+      );
+
+      stream.end(req.file.buffer);
+    });
+
+    fileurl = result.secure_url;
+
+    user.img = fileurl;
+
+    await user.save();
+
+    res.status(200).json({ img: fileurl, user });
+  } catch (error) {
+    console.log(error);
+
+    if (error.name === "JsonWebTokenError") {
+      return res.status(401).json({ msg: "Invalid token" });
+    }
+    if (error.name === "TokenExpiredError") {
+      return res.status(403).json({ msg: "Token expired" });
+    }
+    return res.status(500).json({ msgerr: "Internal server error" });
+  }
+};
+
+export let SetUsername = async (req, res) => {
+  try {
+    const token = req.cookies.refresh_token;
+
+    if (!token) {
+      return res.status(400).json({ msg_login: "please Login" });
+    }
+
+    const access_token = req.headers.authorization?.split(" ")[1];
+
+    if (!access_token) {
+      return res.status(400).json({ msg_login: "please Login" });
+    }
+
+    const decoded = jwt.verify(access_token, config.jwtsecret);
+
+    const user = await UserModel.findById({ _id: decoded.userId });
+
+    if (!user) {
+      return res.status(400).json({ msg_signup: "please signup" });
+    }
+    let { username } = req.body;
+
+    if (username == undefined) {
+      return res.status(400).json({
+        err: "username is required",
+      });
+    }
+
+    user.username = username;
+    await user.save();
+    return res.status(200).json({
+      user,
+    });
+  } catch (error) {
+    console.log(error);
+
+    if (error.name === "JsonWebTokenError") {
+      return res.status(401).json({ msg: "Invalid token" });
+    }
+    if (error.name === "TokenExpiredError") {
+      return res.status(403).json({ msg: "Token expired" });
+    }
+    return res.status(500).json({ msgerr: "Internal server error" });
+  }
+};
+
+export let ChangePassword = async (req, res) => {
+  try {
+    const token = req.cookies.refresh_token;
+
+    if (!token) {
+      return res.status(400).json({ msg_login: "please Login" });
+    }
+
+    const access_token = req.headers.authorization?.split(" ")[1];
+
+    if (!access_token) {
+      return res.status(400).json({ msg_login: "please Login" });
+    }
+
+    const decoded = jwt.verify(access_token, config.jwtsecret);
+
+    const user = await UserModel.findById({ _id: decoded.userId });
+
+    if (!user) {
+      return res.status(400).json({ msg_signup: "please signup" });
+    }
+    let { currentPassword, newPassword, confirmPassword } = req.body;
+
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        errors: errors.array()[0],
+      });
+    }
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+
+    console.log(isMatch);
+
+    if (!isMatch) {
+      return res.status(400).json({ msg_password: "Incorrect Password" });
+    }
+
+    let hashed_password = await bcrypt.hash(newPassword, 12);
+
+    user.password = hashed_password;
+
+    await user.save();
+
+    return res.json({ success: "password is set" });
+  } catch (error) {
+    console.log(error);
+
+    if (error.name === "JsonWebTokenError") {
+      return res.status(401).json({ msg: "Invalid token" });
+    }
+    if (error.name === "TokenExpiredError") {
+      return res.status(403).json({ msg: "Token expired" });
+    }
+    return res.status(500).json({ msgerr: "Internal server error" });
   }
 };

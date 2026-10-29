@@ -16,6 +16,10 @@ const ConversationSchema = new mongoose.Schema(
         ref: "Message",
       },
     ],
+    type: {
+      type: String,
+      default: "double",
+    },
   },
   {
     timestamps: true,

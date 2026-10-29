@@ -1,5 +1,7 @@
 import { Server } from "socket.io";
 import UserModel from "./Models/user.model.js";
+import MessageModel from "./Models/message.model.js";
+import ConversationModel from "./Models/conversation.model.js";
 
 export let io;
 
@@ -8,7 +10,7 @@ const userSocketMap = {};
 export const initSocket = (httpServer) => {
   io = new Server(httpServer, {
     cors: {
-      origin: "https://chat-frontend-one.vercel.app",
+      origin: "http://localhost:5173",
       methods: ["GET", "POST"],
       credentials: true,
     },
@@ -45,6 +47,30 @@ export const initSocket = (httpServer) => {
       }
 
       io.emit("getOnlineUsers", Object.keys(userSocketMap));
+    });
+    socket.on("handelseen", async (props) => {
+      console.log(props, "props");
+
+      let msg = await MessageModel.updateMany(
+        { conversationId: props.conversationId, seen: false },
+        { $set: { seen: true } },
+      );
+      console.log(msg, "msg");
+
+      let conversation = await ConversationModel.findById(props.conversationId);
+
+      let arr = conversation.messages;
+
+      let messagearray = [];
+
+      for (const ele of arr) {
+        let msg = await MessageModel.findById({ _id: ele });
+        messagearray.push(msg);
+      }
+      let socketid = userSocketMap[props.receiverId];
+      console.log(socketid);
+
+      io.to(socketid).emit("message-read", messagearray);
     });
   });
 

@@ -1,9 +1,13 @@
 import express from "express";
 import ConversationValidator from "../validator/addconversation.validator.js";
+import PasswordValidation from "../validator/PasswordValidation.js";
 import {
+  ChangePassword,
   GetMsg,
   SendMsg,
   SetConversation,
+  SetProfileimg,
+  SetUsername,
   uploadVoice,
 } from "../Controller/chat.controller.js";
 import multer from "multer";
@@ -58,6 +62,17 @@ ChatRouter.post(
 );
 
 ChatRouter.post("/chat/getmessage", express.json(), GetMsg);
+
+ChatRouter.post("/chat/setimg", upload.single("img"), SetProfileimg);
+
+ChatRouter.post("/chat/setusername", express.json(), SetUsername);
+
+ChatRouter.post(
+  "/chat/setpassword",
+  express.json(),
+  PasswordValidation,
+  ChangePassword,
+);
 
 // ChatRouter.post(
 //   "/chat/sendmessage",

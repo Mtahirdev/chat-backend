@@ -43,6 +43,9 @@ let user_schema = new mongoose.Schema({
       required: true,
     },
   ],
+  img: {
+    type: String,
+  },
   userarr: [],
 });
 

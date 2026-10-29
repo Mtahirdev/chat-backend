@@ -23,7 +23,11 @@ const MessageSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-
+    conversationId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Conversation",
+      required: true,
+    },
     message: {
       type: String,
       default: "",
@@ -39,6 +43,14 @@ const MessageSchema = new mongoose.Schema(
     msg: {
       type: String,
       required: true,
+    },
+    seen: {
+      type: Boolean,
+      default: false,
+    },
+    delivered: {
+      type: Boolean,
+      default: true,
     },
   },
   {
