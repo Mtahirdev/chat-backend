@@ -52,6 +52,10 @@ const MessageSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    userdata: {
+      type: Array,
+      default: [],
+    },
   },
   {
     timestamps: true,
