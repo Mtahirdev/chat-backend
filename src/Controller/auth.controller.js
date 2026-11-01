@@ -10,47 +10,70 @@ import { emailTemplate, generateotp } from "../utils/utils.js";
 import crypto from "crypto";
 import ConversationModel from "../Models/conversation.model.js";
 import mongoose from "mongoose";
+import { SendEmail } from "../services/email.servicesB.js";
 
 export let SignupFun = async (req, res) => {
   try {
     let { username, email, password } = req.body;
-    const token_cookie = req.cookies.refresh_token;
 
     let error = validationResult(req);
+
     if (!error.isEmpty()) {
-      return res.status(400).json({ msg_validation: error.array()[0] });
+      return res.status(400).json({
+        msg_validation: error.array()[0],
+      });
     }
 
     let hashed_password = await bcrypt.hash(password, 12);
 
-    let newuser = new UserModel({ username, email, password: hashed_password });
+    let newuser = new UserModel({
+      username,
+      email,
+      password: hashed_password,
+    });
 
     let otp = generateotp();
     let html = emailTemplate(otp);
 
-    console.log(otp);
+    // Hash OTP
+    const hashedOtp = crypto.createHash("sha256").update(otp).digest("hex");
 
-    const hashedOtp = await crypto
-      .createHash("sha256")
-      .update(otp)
-      .digest("hex");
-
+    // Store OTP in MongoDB
     const otpstore = new OTP({
       userId: newuser._id,
       email: newuser.email,
       otp: hashedOtp,
     });
+
     await otpstore.save();
 
-    await sendEmail(
+    // Send OTP using Resend
+    const emailResult = await SendEmail(
       newuser.email,
       "OTP Verification",
-      `your otp is ${otp}`,
+      `Your OTP is ${otp}`,
       html,
     );
 
+    // If email fails, remove stored OTP
+    if (!emailResult.success) {
+      await OTP.deleteOne({ _id: otpstore._id });
+
+      return res.status(502).json({
+        msgerr: "Unable to send OTP email. Please try again.",
+      });
+    }
+
+    // Save user
+    await newuser.save();
+
+    // Generate refresh token
     const refresh_token = jwt.sign(
-      { userId: newuser._id, verified: newuser.verified, email: newuser.email },
+      {
+        userId: newuser._id,
+        verified: newuser.verified,
+        email: newuser.email,
+      },
       config.jwtsecret,
       { expiresIn: "7d" },
     );
@@ -61,16 +84,16 @@ export let SignupFun = async (req, res) => {
       secure: true,
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
-    await newuser.save();
 
     return res.json({
-      msg_user: "User is created otp is send to your email",
-      otp: otp,
+      msg_user: "User created. OTP sent to your email.",
     });
   } catch (error) {
     console.log(error);
 
-    return res.status(500).json({ msgerr: "Internal sever error" });
+    return res.status(500).json({
+      msgerr: "Internal server error",
+    });
   }
 };
 
