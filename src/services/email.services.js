@@ -2,6 +2,9 @@ import nodemailer from "nodemailer";
 import config from "../config/config.js";
 const transporter = nodemailer.createTransport({
   service: "gmail",
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true,
   auth: {
     user: config.googleUser, // Still use the full Gmail address
     pass: config.smtpPass, // Change to app password read from environment variable
