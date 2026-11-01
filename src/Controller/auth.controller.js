@@ -63,7 +63,10 @@ export let SignupFun = async (req, res) => {
     });
     await newuser.save();
 
-    return res.json({ msg_user: "User is created otp is send to your email " });
+    return res.json({
+      msg_user: "User is created otp is send to your email",
+      otp: otp,
+    });
   } catch (error) {
     console.log(error);
 
