@@ -1,14 +1,10 @@
 import nodemailer from "nodemailer";
 import config from "../config/config.js";
-
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    type: "OAuth2",
-    user: config.googleUser,
-    clientId: config.googleClientId,
-    clientSecret: config.googleClientSecret,
-    refreshToken: config.googleRefreshToken,
+    user: config.googleUser, // Still use the full Gmail address
+    pass: config.smtpPass, // Change to app password read from environment variable
   },
 });
 
