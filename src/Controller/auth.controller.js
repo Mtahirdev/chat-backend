@@ -48,7 +48,7 @@ export let SignupFun = async (req, res) => {
     await otpstore.save();
 
     // Send OTP using Resend
-    const emailResult = await SendEmail(
+    const emailResult = await sendEmail(
       newuser.email,
       "OTP Verification",
       `Your OTP is ${otp}`,
