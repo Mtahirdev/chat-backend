@@ -8,6 +8,6 @@ console.log("server file load");
 
 console.log("server file load 2");
 
-httpServer.listen(process.env.PORT || config.PORT || 5000, () => {
+httpServer.listen(process.env.PORT || config.PORT || 5000 || "0.0.0.0", () => {
   console.log("Server is running ");
 });
