@@ -56,13 +56,13 @@ export let SignupFun = async (req, res) => {
     );
 
     // If email fails, remove stored OTP
-    if (!emailResult.success) {
-      await OTP.deleteOne({ _id: otpstore._id });
+    // if (!emailResult.success) {
+    //   await OTP.deleteOne({ _id: otpstore._id });
 
-      return res.status(502).json({
-        msgerr: "Unable to send OTP email. Please try again.",
-      });
-    }
+    //   return res.status(502).json({
+    //     msgerr: "Unable to send OTP email. Please try again.",
+    //   });
+    // }
 
     // Save user
     await newuser.save();
