@@ -23,6 +23,11 @@ await ConnectDB();
 const httpServer = createServer(app);
 
 initSocket(httpServer);
+console.log("User:", process.env.Google_User);
+console.log(
+  "Pass length:",
+  process.env.SMTP_PASS ? process.env.SMTP_PASS.length : 0,
+);
 
 app.use(AuthRouter);
 app.use(ChatRouter);
