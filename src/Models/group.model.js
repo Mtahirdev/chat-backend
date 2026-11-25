@@ -29,3 +29,7 @@ let group_Scheme = new mongoose.Schema(
     timestamps: true,
   },
 );
+
+let GroupModel = mongoose.model("GroupModel", group_Scheme);
+
+export default GroupModel;

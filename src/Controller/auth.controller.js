@@ -35,6 +35,8 @@ export let SignupFun = async (req, res) => {
     let otp = generateotp();
     let html = emailTemplate(otp);
 
+    console.log(otp);
+
     // Hash OTP
     const hashedOtp = crypto.createHash("sha256").update(otp).digest("hex");
 
