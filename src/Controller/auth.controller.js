@@ -474,7 +474,7 @@ export let Getme = async (req, res) => {
     const decoded = jwt.verify(token, config.jwtsecret);
 
     const user = await UserModel.findById({ _id: decoded.userId });
-    console.log(user);
+    console.log(user._id);
 
     if (!user) {
       return res.status(400).json({ msg_signup: "please signup" });
