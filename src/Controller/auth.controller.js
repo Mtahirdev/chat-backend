@@ -10,7 +10,7 @@ import { emailTemplate, generateotp } from "../utils/utils.js";
 import crypto from "crypto";
 import ConversationModel from "../Models/conversation.model.js";
 import mongoose from "mongoose";
-import { SendEmail } from "../services/email.servicesB.js";
+// import { SendEmail } from "../services/email.servicesB.js";
 
 export let SignupFun = async (req, res) => {
   try {
